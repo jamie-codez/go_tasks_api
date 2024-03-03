@@ -1,6 +1,9 @@
 package main
 
-import "log"
+import (
+	"fmt"
+	"log"
+)
 
 func main() {
 	config := Config{
@@ -16,6 +19,6 @@ func main() {
 		log.Fatal(err)
 	}
 	store := NewStorage(db)
-	api := NewAPIServer(":8080", store)
+	api := NewAPIServer(fmt.Sprintf("127.0.0.1:%s", Envs.Port), store)
 	api.Start()
 }

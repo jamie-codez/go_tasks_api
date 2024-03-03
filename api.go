@@ -20,6 +20,8 @@ func (s *APIServer) Start() {
 	subRouter := router.PathPrefix("/api/v1").Subrouter()
 
 	// Registering services
+	taskService := NewTaskService(s.store)
+	taskService.RegisterRoutes(router)
 	log.Println("API Server started at", s.address)
 
 	log.Fatal(http.ListenAndServe(s.address, subRouter))

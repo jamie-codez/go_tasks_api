@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -21,7 +20,7 @@ func initAppConfig() AppConfig {
 		Port:       getEnv("PORT", "8080"),
 		DBUser:     getEnv("DB_USER", "dev_user"),
 		DBPassword: getEnv("DB_PASSWORD", "Password123"),
-		DBAddress:  fmt.Sprintf("%s:%s", getEnv("DB_HOST", "localhost"), getEnv("DB_PORT", "5432")),
+		DBAddress:  getEnv("DB_ADDRESS", "localhost"),
 		DBName:     getEnv("DB_NAME", "test_db"),
 		JWTSecret:  getEnv("JWT_SECRET", "secret"),
 	}
