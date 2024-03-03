@@ -53,7 +53,7 @@ func (s *TaskService) handleCreateTask(res http.ResponseWriter, req *http.Reques
 	}
 
 	// Save to DB
-	task, err = s.store.CreateTask(task)
+	task, err = s.store.
 }
 
 func (s *TaskService) handleGetTasks(res http.ResponseWriter, req *http.Request) {

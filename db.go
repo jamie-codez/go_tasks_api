@@ -78,7 +78,8 @@ func (s *PostgresStorage) createProjectsTable() error {
 	_, err := s.db.Exec(`CREATE TABLE IF NOT EXISTS projects (
 	id SERIAL NOT NULL,
 	name VARCHAR(100) NOT NULL,
-	user_id INTEGER NOT NULL,
+	description TEXT NOT NULL,
+	created_by INTEGER NOT NULL,
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (id),

@@ -28,6 +28,19 @@ func (s *Storage) CreateUser(user *User) (*User, error) {
 	return user, nil
 }
 
+func (s *Storage) CreateProject(project *Project) (*Project, error) {
+	rows, err := s.db.Exec("INSERT INTO projects (name,description,created_by) VALUES ($1, $2, $3) RETURNING id", project.Name, project.Description, project.CreatedBy)
+	if err != nil {
+		return nil, err
+	}
+	id, err := rows.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+	project.ID = int(id)
+	return project, nil
+}
+
 func (s *Storage) CreateTask(task *Task) (*Task, error) {
 	rows, err := s.db.Exec("INSERT INTO tasks (title, description, status,project_id,assigned_user_id,deadline) VALUES ($1, $2, $3,$4,$5,$6) RETURNING id", task.Title, task.Description, task.Status, task.ProjectID, task.AssignedTo, task.Deadline)
 	if err != nil {
