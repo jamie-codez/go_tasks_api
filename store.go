@@ -5,6 +5,10 @@ import "database/sql"
 type Store interface {
 	// CreateUser creates a new user in the store
 	CreateUser(task *Task) (*Task, error)
+	// CreateProject creates a new project in the store
+	CreateProject(project *Project) (*Project, error)
+	// CreateTask creates a new task in the store
+	CreateTask(task *Task) (*Task, error)
 }
 
 type Storage struct {

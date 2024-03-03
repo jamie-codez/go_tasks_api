@@ -29,7 +29,7 @@ func (s *TaskService) RegisterRoutes(r *mux.Router) {
 func (s *TaskService) handleCreateTask(res http.ResponseWriter, req *http.Request) {
 	body, err := io.ReadAll(req.Body)
 	if err != nil {
-		http.Error(res, err.Error(), http.StatusBadRequest)
+		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -48,12 +48,16 @@ func (s *TaskService) handleCreateTask(res http.ResponseWriter, req *http.Reques
 	}
 	// Validation
 	if err := validateTaskPayload(task); err != nil {
-		http.Error(res, err.Error(), http.StatusBadRequest)
+		sendError(res, err, http.StatusBadRequest)
 		return
 	}
 
 	// Save to DB
-	task, err = s.store.
+	task, err = s.store.CreateTask(task)
+	if err != nil {
+		sendError(res, err, http.StatusInternalServerError)
+		return
+	}
 }
 
 func (s *TaskService) handleGetTasks(res http.ResponseWriter, req *http.Request) {
