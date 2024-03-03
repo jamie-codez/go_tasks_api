@@ -27,3 +27,11 @@ type Task struct {
 	AssignedTo  int       `json:"assigned_to"`
 	Deadline    time.Time `json:"deadline"`
 }
+
+type Response struct {
+	StatusCode    int         `json:"status_code"`
+	StatusMessage string      `json:"status_message"`
+	HasErrors     bool        `json:"has_errors"`
+	Message       string      `json:"message"`
+	Data          interface{} `json:"data"`
+}

@@ -5,18 +5,28 @@ import (
 	"net/http"
 )
 
-// Serializes the error message and sends it to the client
-func sendError(res http.ResponseWriter, err error, statusCode int) {
-	http.Error(res, err.Error(), statusCode)
-}
-
 // Serializes the response and sends it to the client
-func sendResponse(res http.ResponseWriter, data interface{}, statusCode int) {
+func sendResponse(res http.ResponseWriter, statusCode int, statusMessage string, hasErrors bool, message string, data interface{}) {
 	res.WriteHeader(statusCode)
 	res.Header().Set("Content-Type", "application/json")
 	res.Header().Set("Access-Control-Allow-Origin", "*")
-	err := json.NewEncoder(res).Encode(data)
+	err := json.NewEncoder(res).Encode(Response{
+		StatusCode:    statusCode,
+		StatusMessage: statusMessage,
+		HasErrors:     hasErrors,
+		Message:       message,
+		Data:          data,
+	})
 	if err != nil {
-		sendError(res, err, http.StatusInternalServerError)
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Header().Set("Content-Type", "application/json")
+		res.Header().Set("Access-Control-Allow-Origin", "*")
+		_ = json.NewEncoder(res).Encode(Response{
+			StatusCode:    http.StatusInternalServerError,
+			StatusMessage: "Internal Server Error",
+			HasErrors:     true,
+			Message:       "Failed to serialize response",
+			Data:          nil,
+		})
 	}
 }

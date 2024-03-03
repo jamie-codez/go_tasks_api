@@ -29,35 +29,37 @@ func (s *TaskService) RegisterRoutes(r *mux.Router) {
 func (s *TaskService) handleCreateTask(res http.ResponseWriter, req *http.Request) {
 	body, err := io.ReadAll(req.Body)
 	if err != nil {
-		http.Error(res, err.Error(), http.StatusInternalServerError)
+		sendResponse(res, http.StatusInternalServerError, "Internal Server Error", true, "Failed to read request body", nil)
 		return
 	}
 
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-			http.Error(res, err.Error(), http.StatusInternalServerError)
+			sendResponse(res, http.StatusInternalServerError, "Internal Server Error", true, "Failed to close request body", nil)
+			return
 		}
 	}(req.Body)
 
 	var task *Task
 	err = json.Unmarshal(body, &task)
 	if err != nil {
-		http.Error(res, err.Error(), http.StatusBadRequest)
+		sendResponse(res, http.StatusBadRequest, "Bad Request", true, "Failed to unmarshal request body", nil)
 		return
 	}
 	// Validation
 	if err := validateTaskPayload(task); err != nil {
-		sendError(res, err, http.StatusBadRequest)
+		sendResponse(res, http.StatusBadRequest, "Bad Request", true, err.Error(), nil)
 		return
 	}
 
 	// Save to DB
 	task, err = s.store.CreateTask(task)
 	if err != nil {
-		sendError(res, err, http.StatusInternalServerError)
+		sendResponse(res, http.StatusInternalServerError, "Internal Server Error", true, "Failed to create task", nil)
 		return
 	}
+	sendResponse(res, http.StatusCreated, "Created", false, "Task created successfully", task)
 }
 
 func (s *TaskService) handleGetTasks(res http.ResponseWriter, req *http.Request) {
