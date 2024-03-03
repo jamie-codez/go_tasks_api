@@ -4,7 +4,7 @@ import "database/sql"
 
 type Store interface {
 	// CreateUser creates a new user in the store
-	CreateUser(task *Task) (*Task, error)
+	CreateUser(task *User) (*User, error)
 	// CreateProject creates a new project in the store
 	CreateProject(project *Project) (*Project, error)
 	// CreateTask creates a new task in the store
@@ -29,6 +29,7 @@ func (s *Storage) CreateUser(user *User) (*User, error) {
 		return nil, err
 	}
 	user.ID = int(id)
+	s.db.Close()
 	return user, nil
 }
 
@@ -42,6 +43,7 @@ func (s *Storage) CreateProject(project *Project) (*Project, error) {
 		return nil, err
 	}
 	project.ID = int(id)
+	s.db.Close()
 	return project, nil
 }
 
@@ -55,5 +57,6 @@ func (s *Storage) CreateTask(task *Task) (*Task, error) {
 		return nil, err
 	}
 	task.ID = int(id)
+	s.db.Close()
 	return task, nil
 }

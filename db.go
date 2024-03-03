@@ -26,12 +26,6 @@ func NewPostgresStorage(config Config) *PostgresStorage {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer func(db *sql.DB) {
-		err := db.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
-	}(db)
 	err = db.Ping()
 	if err != nil {
 		log.Fatal(err)
@@ -83,7 +77,7 @@ func (s *PostgresStorage) createProjectsTable() error {
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (id),
-	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+	FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
   );`)
 	if err != nil {
 		log.Println(err)
@@ -93,11 +87,17 @@ func (s *PostgresStorage) createProjectsTable() error {
 }
 
 func (s *PostgresStorage) createTasksTable() error {
-	_, err := s.db.Exec(`CREATE TABLE IF NOT EXISTS tasks (
+	types, err := s.db.Exec(`CREATE TYPE task_status AS ENUM ('TODO', 'IN_PROGRESS','TESTING', 'DONE');`)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	log.Println(types)
+	task, err := s.db.Exec(`CREATE TABLE IF NOT EXISTS tasks (
 	id SERIAL NOT NULL,
 	title VARCHAR(100) NOT NULL,
 	description TEXT NOT NULL,
-	status ENUM('TODO', 'IN_PROGRESS','TESTING', 'DONE') NOT NULL,
+	status task_status NOT NULL DEFAULT 'TODO',
 	project_id INTEGER NOT NULL,
 	assigned_user_id INTEGER NOT NULL,
 	deadline TIMESTAMP NOT NULL,
@@ -113,5 +113,6 @@ func (s *PostgresStorage) createTasksTable() error {
 		log.Println(err)
 		return err
 	}
+	log.Println(task)
 	return err
 }
