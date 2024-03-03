@@ -87,13 +87,19 @@ func (s *PostgresStorage) createProjectsTable() error {
 }
 
 func (s *PostgresStorage) createTasksTable() error {
-	types, err := s.db.Exec(`CREATE TYPE task_status AS ENUM ('TODO', 'IN_PROGRESS','TESTING', 'DONE');`)
+	_, err := s.db.Exec(`DO $$
+		BEGIN
+			IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'task_status') THEN
+				EXECUTE 'CREATE TYPE task_status AS ENUM (''TODO'', ''IN_PROGRESS'',''TESTING'', ''DONE'');';
+			END IF;
+		END
+		$$;
+	`)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
-	log.Println(types)
-	task, err := s.db.Exec(`CREATE TABLE IF NOT EXISTS tasks (
+	_, err = s.db.Exec(`CREATE TABLE IF NOT EXISTS tasks (
 	id SERIAL NOT NULL,
 	title VARCHAR(100) NOT NULL,
 	description TEXT NOT NULL,
@@ -113,6 +119,5 @@ func (s *PostgresStorage) createTasksTable() error {
 		log.Println(err)
 		return err
 	}
-	log.Println(task)
 	return err
 }

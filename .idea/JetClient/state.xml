@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JetClientState">
+    <option name="folders">
+      <list>
+        <folderState>
+          <option name="description" value="Tasks API in Go Lang" />
+          <option name="id" value="7f3c1f7c-d5dc-4e6f-8540-df5e41aa4221" />
+          <option name="name" value="Tasks" />
+          <option name="sortWeight" value="1000000" />
+          <option name="syncProperties">
+            <synchronizationPropertiesState>
+              <option name="folderPath" value="$PROJECT_DIR$/../../Jet Clinet/Task" />
+            </synchronizationPropertiesState>
+          </option>
+        </folderState>
+      </list>
+    </option>
+    <option name="id" value="628412f7-dd25-451b-9edd-98c003794d8a" />
+  </component>
+</project>
