@@ -1,7 +1,10 @@
 package main
 
 import (
+	"encoding/json"
+	"errors"
 	"github.com/gorilla/mux"
+	"io"
 	"net/http"
 )
 
@@ -24,7 +27,33 @@ func (s *TaskService) RegisterRoutes(r *mux.Router) {
 }
 
 func (s *TaskService) handleCreateTask(res http.ResponseWriter, req *http.Request) {
+	body, err := io.ReadAll(req.Body)
+	if err != nil {
+		http.Error(res, err.Error(), http.StatusBadRequest)
+		return
+	}
 
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			http.Error(res, err.Error(), http.StatusInternalServerError)
+		}
+	}(req.Body)
+
+	var task *Task
+	err = json.Unmarshal(body, &task)
+	if err != nil {
+		http.Error(res, err.Error(), http.StatusBadRequest)
+		return
+	}
+	// Validation
+	if err := validateTaskPayload(task); err != nil {
+		http.Error(res, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Save to DB
+	task, err = s.store.CreateTask(task)
 }
 
 func (s *TaskService) handleGetTasks(res http.ResponseWriter, req *http.Request) {
@@ -49,4 +78,26 @@ func (s *TaskService) handleDeleteTask(res http.ResponseWriter, req *http.Reques
 
 func (s *TaskService) handleDeleteTasks(res http.ResponseWriter, req *http.Request) {
 
+}
+
+func validateTaskPayload(t *Task) error {
+	if t.Title == "" {
+		return errors.New("title is required")
+	}
+	if t.Description == "" {
+		return errors.New("description is required")
+	}
+	if t.Status == "" {
+		return errors.New("status is required")
+	}
+	if t.ProjectID == 0 {
+		return errors.New("ProjectID is required")
+	}
+	if t.AssignedTo == 0 {
+		return errors.New("AssignedTo is required")
+	}
+	if t.Deadline.IsZero() {
+		return errors.New("deadline is required")
+	}
+	return nil
 }
